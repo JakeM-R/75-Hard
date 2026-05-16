@@ -114,7 +114,7 @@
       background: var(--bg);
       padding-bottom: calc(58px + env(safe-area-inset-bottom));
     }
-    .screen.active { display: block; }
+    .screen.active { display: flex; flex-direction: column; }
 
     /* ── Tab Bar ── */
     .tab-bar {
@@ -127,14 +127,14 @@
     }
     .tab-bar button {
       flex: 1; background: none; border: none; cursor: pointer;
-      padding: 10px 0 8px;
+      padding: 8px 0 6px;
       display: flex; flex-direction: column; align-items: center; gap: 3px;
       color: var(--text-secondary);
       font-family: var(--font-body); font-size: 11px;
       transition: color 0.15s;
     }
     .tab-bar button.active { color: var(--text-primary); }
-    .tab-bar button svg { width: 22px; height: 22px; }
+    .tab-bar button svg { width: 20px; height: 20px; }
 
     /* ── Shared ── */
     .screen-header {
@@ -252,18 +252,19 @@
     /* ── Today Screen ── */
     .today-hero {
       text-align: center;
-      padding: 20px 24px 16px;
+      padding: 8px 20px 8px;
+      flex-shrink: 0;
     }
     .today-day {
       font-family: var(--font-heading);
-      font-size: 52px; font-weight: 700;
+      font-size: 38px; font-weight: 700;
       color: var(--text-primary); line-height: 1;
       margin-bottom: 4px;
     }
-    .today-day span { font-size: 26px; color: var(--text-secondary); }
-    .today-date { color: var(--text-secondary); font-size: 13px; }
+    .today-day span { font-size: 20px; color: var(--text-secondary); }
+    .today-date { color: var(--text-secondary); font-size: 12px; }
 
-    .progress-bar-wrap { padding: 0 20px 16px; }
+    .progress-bar-wrap { padding: 0 20px 10px; flex-shrink: 0; }
     .progress-bar-track {
       height: 2px; background: var(--border); border-radius: 1px; overflow: hidden;
     }
@@ -272,12 +273,18 @@
       transition: width 0.3s ease;
     }
 
-    .task-rows { padding: 0 16px; }
+    .task-rows {
+      flex: 1;
+      display: flex; flex-direction: column;
+      padding: 0 16px;
+      overflow: hidden;
+    }
     .task-row {
+      flex: 1;
       display: flex; align-items: center; gap: 14px;
-      padding: 14px 4px;
+      padding: 0 4px;
       border-bottom: 1px solid var(--border);
-      cursor: pointer; min-height: 56px;
+      cursor: pointer; min-height: 50px;
       -webkit-tap-highlight-color: transparent;
     }
     .task-row:last-child { border-bottom: none; }
