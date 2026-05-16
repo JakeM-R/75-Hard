@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="splash-showing">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -147,6 +147,8 @@
     }
 
     /* ── Splash Screen ── */
+    html.splash-showing,
+    html.splash-showing body { background: #000 !important; }
     #screen-splash {
       position: fixed; inset: 0;
       background: #000;
@@ -646,7 +648,6 @@
     ];
 
     function showSplash() {
-      document.body.style.background = '#000';
       const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
       const el = document.getElementById('splash-quote');
       el.textContent = q.text;
@@ -656,7 +657,7 @@
       const splash = document.getElementById('screen-splash');
       setTimeout(() => {
         splash.classList.add('fade-out');
-        setTimeout(() => { splash.remove(); document.body.style.background = ''; }, 700);
+        setTimeout(() => { splash.remove(); document.documentElement.classList.remove('splash-showing'); }, 700);
       }, 2300);
     }
 
