@@ -70,6 +70,8 @@
     }
 
     /* ── Per-theme design overrides ── */
+
+    /* Hero — parchment and stone, the weight of what came before */
     [data-theme="hero"] .setup-label,
     [data-theme="hero"] .settings-section-label,
     [data-theme="hero"] .screen-title {
@@ -77,10 +79,47 @@
       letter-spacing: 0.16em;
       font-size: 11px;
     }
+    [data-theme="hero"] .today-day {
+      font-family: var(--font-heading);
+      letter-spacing: 0.04em;
+    }
+    [data-theme="hero"] .task-row-label {
+      font-family: var(--font-heading);
+      font-size: 13px;
+      letter-spacing: 0.06em;
+    }
+    [data-theme="hero"] .tab-bar button {
+      font-family: var(--font-heading);
+      font-size: 8px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
 
+    /* Anime — HUD, electric, the moment before the power shows */
     [data-theme="anime"] .task-row-label { font-weight: 600; letter-spacing: 0.02em; }
     [data-theme="anime"] .tab-bar button { text-transform: uppercase; letter-spacing: 0.1em; font-size: 9px; }
+    [data-theme="anime"] .today-day {
+      font-family: var(--font-heading);
+      letter-spacing: -0.01em;
+    }
+    [data-theme="anime"] .task-checkbox { border-radius: 0; }
+    [data-theme="anime"] .task-row.checked .task-checkbox {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
 
+    /* Spark — italic urgency, worn crimson, chaos that is secretly discipline */
+    [data-theme="spark"] .today-day {
+      font-family: var(--font-heading);
+      font-style: italic;
+      font-weight: 400;
+    }
+    [data-theme="spark"] .task-row-label {
+      font-style: italic;
+      font-family: var(--font-heading);
+      font-size: 15px;
+    }
     [data-theme="spark"] .today-date,
     [data-theme="spark"] .task-row-badge,
     [data-theme="spark"] .hist-date,
@@ -89,8 +128,23 @@
       font-family: var(--font-heading);
     }
 
+    /* Abyss — near-invisible, the act remains when the reason goes quiet */
+    [data-theme="abyss"] .today-day {
+      font-family: var(--font-heading);
+      font-weight: 300;
+      letter-spacing: 0.1em;
+    }
+    [data-theme="abyss"] .task-row-label {
+      font-family: var(--font-heading);
+      font-weight: 300;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+    }
     [data-theme="abyss"] .task-row { padding-top: 18px; padding-bottom: 18px; }
-    [data-theme="abyss"] .task-row-label { letter-spacing: 0.04em; }
+    [data-theme="abyss"] .task-row.checked .task-checkbox {
+      border-color: #4A0A0A;
+      color: #4A0A0A;
+    }
 
     /* ── Reset & Base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -112,7 +166,7 @@
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       background: var(--bg);
-      padding-bottom: calc(58px + env(safe-area-inset-bottom));
+      padding-bottom: 58px;
     }
     .screen.active { display: flex; flex-direction: column; }
 
@@ -122,7 +176,7 @@
       background: var(--surface);
       border-top: 1px solid var(--border);
       display: flex;
-      padding-bottom: env(safe-area-inset-bottom);
+      padding-bottom: 0;
       z-index: 100;
     }
     .tab-bar button {
@@ -252,19 +306,19 @@
     /* ── Today Screen ── */
     .today-hero {
       text-align: center;
-      padding: 8px 20px 8px;
+      padding: 20px 20px 12px;
       flex-shrink: 0;
     }
     .today-day {
       font-family: var(--font-heading);
-      font-size: 38px; font-weight: 700;
+      font-size: 52px; font-weight: 700;
       color: var(--text-primary); line-height: 1;
       margin-bottom: 4px;
     }
-    .today-day span { font-size: 20px; color: var(--text-secondary); }
-    .today-date { color: var(--text-secondary); font-size: 12px; }
+    .today-day span { font-size: 24px; color: var(--text-secondary); }
+    .today-date { color: var(--text-secondary); font-size: 13px; }
 
-    .progress-bar-wrap { padding: 0 20px 10px; flex-shrink: 0; }
+    .progress-bar-wrap { padding: 0 20px 12px; flex-shrink: 0; }
     .progress-bar-track {
       height: 2px; background: var(--border); border-radius: 1px; overflow: hidden;
     }
@@ -277,14 +331,13 @@
       flex: 1;
       display: flex; flex-direction: column;
       padding: 0 16px;
-      overflow: hidden;
+      overflow-y: auto;
     }
     .task-row {
-      flex: 1;
       display: flex; align-items: center; gap: 14px;
-      padding: 0 4px;
+      padding: 14px 4px;
       border-bottom: 1px solid var(--border);
-      cursor: pointer; min-height: 50px;
+      cursor: pointer; min-height: 56px;
       -webkit-tap-highlight-color: transparent;
     }
     .task-row:last-child { border-bottom: none; }
