@@ -433,6 +433,11 @@
     <div class="settings-section" style="padding-bottom: 32px;">
       <div class="settings-section-label">Data</div>
       <button class="btn-settings" id="btn-export">Export Log (JSON)</button>
+      <button class="btn-settings btn-danger" id="btn-delete">Delete Challenge</button>
+      <div class="confirm-row" id="confirm-delete-row">
+        <button class="btn-confirm-no" id="btn-delete-no">Cancel</button>
+        <button class="btn-confirm-yes" id="btn-delete-yes">Yes, delete everything</button>
+      </div>
       <button class="btn-settings btn-danger" id="btn-reset">Reset Challenge</button>
       <div class="confirm-row" id="confirm-row">
         <button class="btn-confirm-no" id="btn-confirm-no">Cancel</button>
@@ -898,6 +903,22 @@
       const btn = document.getElementById('btn-save-tasks');
       btn.textContent = 'Saved ✓';
       setTimeout(() => { btn.textContent = 'Save Tasks'; }, 1500);
+    });
+
+    document.getElementById('btn-delete').addEventListener('click', () => {
+      document.getElementById('confirm-delete-row').classList.add('open');
+    });
+    document.getElementById('btn-delete-no').addEventListener('click', () => {
+      document.getElementById('confirm-delete-row').classList.remove('open');
+    });
+    document.getElementById('btn-delete-yes').addEventListener('click', () => {
+      localStorage.removeItem(CONFIG_KEY);
+      localStorage.removeItem(LOG_KEY);
+      document.body.dataset.theme = 'quest';
+      document.getElementById('tab-bar').style.display = 'none';
+      document.getElementById('confirm-delete-row').classList.remove('open');
+      initSetup();
+      showScreen('setup');
     });
 
     document.getElementById('btn-export').addEventListener('click', () => {
