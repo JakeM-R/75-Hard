@@ -68,7 +68,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; }
     body {
-      background: var(--bg);
+      background: var(--surface);
       color: var(--text-primary);
       font-family: var(--font-body);
       font-size: 16px;
@@ -96,13 +96,6 @@
       display: flex;
       padding-bottom: env(safe-area-inset-bottom);
       z-index: 100;
-    }
-    .tab-bar::after {
-      content: '';
-      position: absolute;
-      bottom: -80px; left: 0; right: 0;
-      height: 80px;
-      background: var(--surface);
     }
     .tab-bar button {
       flex: 1; background: none; border: none; cursor: pointer;
