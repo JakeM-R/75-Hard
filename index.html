@@ -146,6 +146,21 @@
       color: #4A0A0A;
     }
 
+    /* ── Splash Screen ── */
+    #screen-splash {
+      position: fixed; inset: 0;
+      background: #000;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 999; padding: 40px;
+      opacity: 1; transition: opacity 0.7s ease;
+    }
+    #screen-splash.fade-out { opacity: 0; pointer-events: none; }
+    #splash-quote {
+      text-align: center;
+      font-size: 28px; line-height: 1.4;
+      max-width: 320px;
+    }
+
     /* ── Reset & Base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; }
@@ -283,17 +298,12 @@
     .btn-del { color: var(--danger) !important; }
 
     /* Theme selector */
-    .theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-    .theme-card {
-      border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 6px;
-      cursor: pointer; text-align: center; transition: border-color 0.15s;
+    .theme-select {
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text-primary); font-family: var(--font-body); font-size: 15px;
+      padding: 12px 14px; border-radius: var(--radius);
+      appearance: none; -webkit-appearance: none; cursor: pointer;
     }
-    .theme-card.active { border-color: var(--text-secondary); }
-    .theme-swatch {
-      width: 28px; height: 28px; border-radius: 50%;
-      margin: 0 auto 6px;
-    }
-    .theme-card-name { font-size: 10px; color: var(--text-secondary); line-height: 1.2; }
 
     .btn-start {
       display: block; width: calc(100% - 40px); margin: 4px 20px 40px;
@@ -425,7 +435,10 @@
     }
   </style>
 </head>
-<body data-theme="quest">
+<body data-theme="hero">
+
+  <!-- ══ SPLASH SCREEN ══ -->
+  <div id="screen-splash"><div id="splash-quote"></div></div>
 
   <!-- ══ SETUP SCREEN ══ -->
   <section id="screen-setup" class="screen active">
@@ -491,7 +504,7 @@
 
     <div class="settings-section">
       <div class="settings-section-label">Theme</div>
-      <div class="theme-grid" id="settings-theme-grid"></div>
+      <select id="settings-theme-select" class="theme-select"></select>
     </div>
 
     <div class="settings-divider"></div>
@@ -603,30 +616,47 @@
 
     // ── Theme ──
     const THEMES = [
-      { id: 'quest', name: 'Quest',    bg: '#0E1210', accent: '#4A7358' },
-      { id: 'hero',  name: 'Old World', bg: '#1C1A14', accent: '#D4B896' },
-      { id: 'anime', name: 'Anime',    bg: '#0D0A1A', accent: '#9B30FF' },
-      { id: 'spark', name: 'Spark',    bg: '#1A1410', accent: '#9B2335' },
-      { id: 'abyss', name: 'Abyss',   bg: '#000000', accent: '#333338' },
+      { id: 'hero',  name: 'Hero'  },
+      { id: 'anime', name: 'Anime' },
+      { id: 'spark', name: 'Spark' },
+      { id: 'abyss', name: 'Abyss' },
     ];
 
     function applyTheme(id) { document.body.dataset.theme = id; }
 
-    function buildThemeGrid(containerId, currentTheme, onSelect) {
-      const grid = document.getElementById(containerId);
-      grid.innerHTML = '';
-      THEMES.forEach(t => {
-        const card = document.createElement('div');
-        card.className = 'theme-card' + (t.id === currentTheme ? ' active' : '');
-        card.innerHTML = `<div class="theme-swatch" style="background:${t.accent}"></div><div class="theme-card-name">${t.name}</div>`;
-        card.addEventListener('click', () => {
-          grid.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
-          card.classList.add('active');
-          applyTheme(t.id);
-          onSelect(t.id);
-        });
-        grid.appendChild(card);
+    function buildThemeSelect(currentTheme) {
+      const sel = document.getElementById('settings-theme-select');
+      sel.innerHTML = THEMES.map(t =>
+        `<option value="${t.id}"${t.id === currentTheme ? ' selected' : ''}>${t.name}</option>`
+      ).join('');
+      sel.addEventListener('change', () => {
+        const c = loadConfig(); c.theme = sel.value; saveConfig(c);
+        applyTheme(sel.value);
       });
+    }
+
+    // ── Splash ──
+    const QUOTES = [
+      { text: 'Arise',          color: '#7B4FD4', font: "'Cinzel', Georgia, serif",              italic: false },
+      { text: 'Nevermore',      color: '#8C1A2A', font: "'Cormorant Garamond', Palatino, serif", italic: false },
+      { text: 'You must change your life',
+                                color: '#E8D8C0', font: "'IM Fell English', Palatino, serif",    italic: true  },
+      { text: 'But I must… I must… I must! Away with this weakness!',
+                                color: '#E8D8C0', font: "'IM Fell English', Palatino, serif",    italic: true  },
+    ];
+
+    function showSplash() {
+      const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+      const el = document.getElementById('splash-quote');
+      el.textContent = q.text;
+      el.style.color = q.color;
+      el.style.fontFamily = q.font;
+      el.style.fontStyle = q.italic ? 'italic' : 'normal';
+      const splash = document.getElementById('screen-splash');
+      setTimeout(() => {
+        splash.classList.add('fade-out');
+        setTimeout(() => splash.remove(), 700);
+      }, 2300);
     }
 
     // ── Navigation ──
@@ -793,31 +823,9 @@
         rows.appendChild(row);
       });
 
-      // Photo row
-      const photoRow = document.createElement('div');
-      photoRow.className = 'task-row' + (entry.photoTaken ? ' checked' : '');
-      photoRow.innerHTML = `
-        <div class="task-checkbox">
-          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="2 6.5 5.5 10 11 3"/>
-          </svg>
-        </div>
-        <div class="task-row-content"><div class="task-row-label">Progress photo taken</div></div>`;
-      if (!isComplete) {
-        photoRow.addEventListener('click', () => {
-          const l = loadLog();
-          const key = todayKey();
-          if (!l[key]) l[key] = { completed: [], photoTaken: false };
-          l[key].photoTaken = !l[key].photoTaken;
-          saveLog(l);
-          renderToday();
-        });
-      }
-      rows.appendChild(photoRow);
-
-      // Progress: daily tasks + photo only
-      const total = dailyTasks.length + 1;
-      const done = dailyTasks.filter(t => entry.completed.includes(t.id)).length + (entry.photoTaken ? 1 : 0);
+      // Progress: daily tasks only
+      const total = dailyTasks.length;
+      const done = dailyTasks.filter(t => entry.completed.includes(t.id)).length;
       const pct = total > 0 ? Math.round((done / total) * 100) : 0;
       document.getElementById('today-progress').style.width = pct + '%';
     }
@@ -913,9 +921,7 @@
       settingsFreq = 'daily';
       settingsWeeklyCount = 3;
 
-      buildThemeGrid('settings-theme-grid', config.theme, id => {
-        const c = loadConfig(); c.theme = id; saveConfig(c);
-      });
+      buildThemeSelect(config.theme);
 
       document.getElementById('settings-weekly-stepper').style.display = 'none';
       document.getElementById('settings-stepper-val').textContent = 3;
@@ -1002,7 +1008,7 @@
     document.getElementById('btn-delete-yes').addEventListener('click', () => {
       localStorage.removeItem(CONFIG_KEY);
       localStorage.removeItem(LOG_KEY);
-      document.body.dataset.theme = 'quest';
+      document.body.dataset.theme = 'hero';
       document.getElementById('tab-bar').style.display = 'none';
       document.getElementById('confirm-delete-row').classList.remove('open');
       initSetup();
@@ -1039,6 +1045,7 @@
 
     // ── Init ──
     (function init() {
+      showSplash();
       let config = loadConfig();
       if (config) {
         // Migrate old specific-day arrays to weekly count
@@ -1048,6 +1055,8 @@
           return t;
         });
         if (changed) saveConfig(config);
+        // Migrate quest theme to hero
+        if (!config.theme || config.theme === 'quest') { config.theme = 'hero'; saveConfig(config); }
         applyTheme(config.theme);
         document.getElementById('tab-bar').style.display = 'flex';
         showScreen('today');
