@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="splash-showing">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -144,23 +144,6 @@
     [data-theme="abyss"] .task-row.checked .task-checkbox {
       border-color: #4A0A0A;
       color: #4A0A0A;
-    }
-
-    /* ── Splash Screen ── */
-    html.splash-showing,
-    html.splash-showing body { background: #000 !important; }
-    #screen-splash {
-      position: fixed; inset: 0;
-      background: #000;
-      display: flex; align-items: center; justify-content: center;
-      z-index: 999; padding: 40px;
-      opacity: 1; transition: opacity 0.7s ease;
-    }
-    #screen-splash.fade-out { opacity: 0; pointer-events: none; }
-    #splash-quote {
-      text-align: center;
-      font-size: 28px; line-height: 1.4;
-      max-width: 320px;
     }
 
     /* ── Reset & Base ── */
@@ -439,9 +422,6 @@
 </head>
 <body data-theme="hero">
 
-  <!-- ══ SPLASH SCREEN ══ -->
-  <div id="screen-splash"><div id="splash-quote"></div></div>
-
   <!-- ══ SETUP SCREEN ══ -->
   <section id="screen-setup" class="screen active">
     <div class="setup-hero">
@@ -635,30 +615,6 @@
         const c = loadConfig(); c.theme = sel.value; saveConfig(c);
         applyTheme(sel.value);
       });
-    }
-
-    // ── Splash ──
-    const QUOTES = [
-      { text: 'Arise',          color: '#7B4FD4', font: "'Cinzel', Georgia, serif",              italic: false },
-      { text: 'Nevermore',      color: '#8C1A2A', font: "'Cormorant Garamond', Palatino, serif", italic: false },
-      { text: 'You must change your life',
-                                color: '#E8D8C0', font: "'IM Fell English', Palatino, serif",    italic: true  },
-      { text: 'But I must… I must… I must! Away with this weakness!',
-                                color: '#E8D8C0', font: "'IM Fell English', Palatino, serif",    italic: true  },
-    ];
-
-    function showSplash() {
-      const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-      const el = document.getElementById('splash-quote');
-      el.textContent = q.text;
-      el.style.color = q.color;
-      el.style.fontFamily = q.font;
-      el.style.fontStyle = q.italic ? 'italic' : 'normal';
-      const splash = document.getElementById('screen-splash');
-      setTimeout(() => {
-        splash.classList.add('fade-out');
-        setTimeout(() => { splash.remove(); document.documentElement.classList.remove('splash-showing'); }, 700);
-      }, 2300);
     }
 
     // ── Navigation ──
@@ -1047,7 +1003,6 @@
 
     // ── Init ──
     (function init() {
-      showSplash();
       let config = loadConfig();
       if (config) {
         // Migrate old specific-day arrays to weekly count
