@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="75 Hard">
+  <meta name="theme-color" content="#0E1210">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>75 Hard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Saira+Condensed:wght@400;600;700&family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── Theme Tokens ── */
+    [data-theme="hero"] {
+      --bg: #1C1A14; --surface: #2A2620; --border: #252320;
+      --text-primary: #E8DCC8; --text-secondary: #A89880;
+      --accent: #D4B896;
+      --success: #4A7C59; --success-text: #C8E8D4;
+      --warning: #9C7A3C; --warning-text: #F0DCA0;
+      --danger: #8B3A3A; --danger-text: #F0C0C0;
+      --font-heading: 'Cinzel', 'Georgia', serif;
+      --font-body: system-ui, -apple-system, sans-serif;
+    }
+    [data-theme="anime"] {
+      --bg: #0D0A1A; --surface: #1A1530; --border: #2D2250;
+      --text-primary: #E0D8FF; --text-secondary: #8A7FB8;
+      --accent: #9B30FF;
+      --success: #00C896; --success-text: #003828;
+      --warning: #F0A500; --warning-text: #3A2800;
+      --danger: #FF3864; --danger-text: #3A0010;
+      --font-heading: 'Saira Condensed', 'Arial Narrow', sans-serif;
+      --font-body: system-ui, -apple-system, sans-serif;
+    }
+    [data-theme="spark"] {
+      --bg: #1A1410; --surface: #261E16; --border: #3A2A1E;
+      --text-primary: #E8D8C0; --text-secondary: #9A8068;
+      --accent: #9B2335;
+      --success: #4E7C5F; --success-text: #C0E0CC;
+      --warning: #9C6B2E; --warning-text: #F0D8A0;
+      --danger: #8B2020; --danger-text: #F0C0C0;
+      --font-heading: 'IM Fell English', 'Palatino Linotype', serif;
+      --font-body: system-ui, -apple-system, sans-serif;
+    }
+    [data-theme="abyss"] {
+      --bg: #0A0A0C; --surface: #141418; --border: #1E1E24;
+      --text-primary: #C8C8D0; --text-secondary: #60606A;
+      --accent: #6B7280;
+      --success: #2D5A3D; --success-text: #A0D0B0;
+      --warning: #7A5C2E; --warning-text: #E0C880;
+      --danger: #6B1F1F; --danger-text: #E0A0A0;
+      --font-heading: 'Cormorant Garamond', 'Palatino Linotype', serif;
+      --font-body: system-ui, -apple-system, sans-serif;
+    }
+    [data-theme="quest"] {
+      --bg: #0E1210; --surface: #161C18; --border: #222C24;
+      --text-primary: #D4DCD6; --text-secondary: #6A7A6C;
+      --accent: #4A7358;
+      --success: #3D6B4A; --success-text: #B0D8BC;
+      --warning: #7A6830; --warning-text: #E0D090;
+      --danger: #6B2828; --danger-text: #E0B0B0;
+      --font-heading: 'Outfit', system-ui, sans-serif;
+      --font-body: 'Outfit', system-ui, sans-serif;
+    }
+
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 16px;
+      min-height: 100%;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Screens ── */
+    .screen { display: none; padding: 0 0 80px 0; min-height: 100dvh; }
+    .screen.active { display: block; }
+
+    /* ── Tab Bar ── */
+    .tab-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 100;
+    }
+    .tab-bar button {
+      flex: 1; background: none; border: none; cursor: pointer;
+      padding: 10px 0 8px;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      color: var(--text-secondary);
+      font-family: var(--font-body); font-size: 11px;
+      transition: color 0.15s;
+    }
+    .tab-bar button.active { color: var(--accent); }
+    .tab-bar button svg { width: 22px; height: 22px; }
+
+    /* ── Shared Components ── */
+    .screen-header {
+      padding: 20px 20px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .screen-title {
+      font-family: var(--font-heading);
+      font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    /* ── Setup Screen ── */
+    #screen-setup {
+      padding: 0;
+      overflow-y: auto;
+    }
+    .setup-hero {
+      text-align: center;
+      padding: 48px 24px 32px;
+    }
+    .setup-hero h1 {
+      font-family: var(--font-heading);
+      font-size: 36px; font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .setup-hero p { color: var(--text-secondary); font-size: 14px; }
+
+    .setup-section { padding: 0 20px 28px; }
+    .setup-label {
+      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-secondary); margin-bottom: 10px;
+    }
+
+    .date-input {
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text-primary); font-family: var(--font-body); font-size: 15px;
+      padding: 12px 14px; border-radius: 8px;
+      appearance: none; -webkit-appearance: none;
+    }
+    .date-input:focus { outline: none; border-color: var(--accent); }
+
+    /* Task Builder */
+    .task-add-row {
+      display: flex; gap: 8px; margin-bottom: 12px;
+    }
+    .task-input {
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text-primary); font-family: var(--font-body); font-size: 15px;
+      padding: 11px 14px; border-radius: 8px;
+    }
+    .task-input::placeholder { color: var(--text-secondary); }
+    .task-input:focus { outline: none; border-color: var(--accent); }
+    .btn-add {
+      background: var(--accent); color: var(--bg);
+      border: none; border-radius: 8px; padding: 0 16px;
+      font-family: var(--font-body); font-size: 20px; font-weight: 600;
+      cursor: pointer; line-height: 1;
+    }
+
+    .freq-toggle {
+      display: flex; gap: 6px; margin-bottom: 10px;
+    }
+    .freq-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text-secondary); font-family: var(--font-body); font-size: 12px;
+      padding: 6px 12px; border-radius: 6px; cursor: pointer;
+    }
+    .freq-btn.active { border-color: var(--accent); color: var(--accent); }
+
+    .day-picker { display: flex; gap: 5px; margin-bottom: 12px; }
+    .day-pill {
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text-secondary); font-family: var(--font-body); font-size: 11px;
+      padding: 7px 0; border-radius: 6px; cursor: pointer; text-align: center;
+    }
+    .day-pill.active { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+
+    .task-list { display: flex; flex-direction: column; gap: 6px; }
+    .task-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .task-item-label { flex: 1; font-size: 14px; }
+    .task-item-freq { font-size: 11px; color: var(--text-secondary); }
+    .task-item-btns { display: flex; gap: 4px; }
+    .task-item-btns button {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-secondary); font-size: 14px; padding: 2px 6px;
+    }
+    .task-item-btns button:hover { color: var(--text-primary); }
+    .btn-del { color: var(--danger) !important; }
+
+    /* Theme selector */
+    .theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .theme-card {
+      border: 2px solid var(--border); border-radius: 10px; padding: 10px 6px;
+      cursor: pointer; text-align: center; transition: border-color 0.15s;
+    }
+    .theme-card.active { border-color: var(--accent); }
+    .theme-swatch {
+      width: 32px; height: 32px; border-radius: 50%;
+      margin: 0 auto 6px;
+      border: 2px solid rgba(255,255,255,0.1);
+    }
+    .theme-card-name { font-size: 10px; color: var(--text-secondary); line-height: 1.2; }
+
+    .btn-start {
+      display: block; width: calc(100% - 40px); margin: 8px 20px 40px;
+      background: var(--accent); color: var(--bg);
+      border: none; border-radius: 10px; padding: 16px;
+      font-family: var(--font-heading); font-size: 16px; font-weight: 600;
+      letter-spacing: 0.08em; cursor: pointer;
+    }
+
+    /* ── Today Screen ── */
+    .today-hero {
+      text-align: center;
+      padding: 40px 24px 24px;
+    }
+    .today-day {
+      font-family: var(--font-heading);
+      font-size: 56px; font-weight: 700;
+      color: var(--text-primary); line-height: 1;
+      margin-bottom: 4px;
+    }
+    .today-day span { font-size: 28px; color: var(--text-secondary); }
+    .today-date { color: var(--text-secondary); font-size: 14px; }
+
+    .progress-bar-wrap { padding: 0 20px 20px; }
+    .progress-bar-track {
+      height: 3px; background: var(--border); border-radius: 2px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; background: var(--accent); border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    .task-rows { padding: 0 16px; }
+    .task-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 4px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer; min-height: 56px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .task-row:last-child { border-bottom: none; }
+    .task-checkbox {
+      width: 22px; height: 22px; flex-shrink: 0;
+      border: 2px solid var(--border); border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .task-row.checked .task-checkbox {
+      background: var(--accent); border-color: var(--accent);
+    }
+    .task-checkbox svg { display: none; }
+    .task-row.checked .task-checkbox svg { display: block; }
+    .task-row-label { font-size: 16px; flex: 1; }
+    .task-row.checked .task-row-label { color: var(--text-secondary); }
+
+    /* ── History Screen ── */
+    .history-list { padding: 0 16px; }
+    .hist-row {
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .hist-row-main {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 4px; min-height: 56px;
+    }
+    .hist-day-num {
+      font-family: var(--font-heading); font-size: 13px;
+      color: var(--text-secondary); width: 44px; flex-shrink: 0;
+    }
+    .hist-date { flex: 1; font-size: 14px; }
+    .hist-status {
+      font-size: 18px; width: 28px; text-align: center; flex-shrink: 0;
+    }
+    .hist-detail {
+      display: none; padding: 0 4px 14px 60px;
+    }
+    .hist-detail.open { display: block; }
+    .hist-detail-item {
+      font-size: 13px; color: var(--text-secondary);
+      padding: 2px 0; display: flex; align-items: center; gap: 8px;
+    }
+    .hist-detail-item::before { content: '·'; }
+
+    /* ── Settings Screen ── */
+    .settings-section { padding: 24px 20px 0; }
+    .settings-section-label {
+      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-secondary); margin-bottom: 12px;
+    }
+    .settings-divider { height: 1px; background: var(--border); margin: 24px 20px 0; }
+
+    .btn-settings {
+      display: block; width: 100%;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text-primary); font-family: var(--font-body); font-size: 15px;
+      padding: 13px 16px; border-radius: 8px; cursor: pointer; text-align: left;
+      margin-bottom: 8px;
+    }
+    .btn-danger { color: var(--danger) !important; border-color: var(--danger) !important; }
+
+    .confirm-row {
+      display: none; gap: 8px; margin-bottom: 8px;
+    }
+    .confirm-row.open { display: flex; }
+    .btn-confirm-yes {
+      flex: 1; background: var(--danger); color: var(--danger-text);
+      border: none; border-radius: 8px; padding: 12px; font-family: var(--font-body);
+      font-size: 14px; cursor: pointer;
+    }
+    .btn-confirm-no {
+      flex: 1; background: var(--surface); color: var(--text-secondary);
+      border: 1px solid var(--border); border-radius: 8px; padding: 12px;
+      font-family: var(--font-body); font-size: 14px; cursor: pointer;
+    }
+
+    .settings-task-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .btn-save-tasks {
+      background: var(--accent); color: var(--bg);
+      border: none; border-radius: 8px; padding: 12px 20px;
+      font-family: var(--font-body); font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+  </style>
+</head>
+<body data-theme="quest">
+
+  <!-- ══ SETUP SCREEN ══ -->
+  <section id="screen-setup" class="screen active">
+    <div class="setup-hero">
+      <h1>75 Hard</h1>
+      <p>Configure your challenge</p>
+    </div>
+
+    <div class="setup-section">
+      <div class="setup-label">Start Date</div>
+      <input type="date" id="setup-date" class="date-input">
+    </div>
+
+    <div class="setup-section">
+      <div class="setup-label">Tasks</div>
+      <div class="freq-toggle">
+        <button class="freq-btn active" data-freq="daily">Daily</button>
+        <button class="freq-btn" data-freq="specific">Specific days</button>
+      </div>
+      <div class="day-picker" id="setup-day-picker" style="display:none">
+        <button class="day-pill" data-day="0">S</button>
+        <button class="day-pill" data-day="1">M</button>
+        <button class="day-pill" data-day="2">T</button>
+        <button class="day-pill" data-day="3">W</button>
+        <button class="day-pill" data-day="4">T</button>
+        <button class="day-pill" data-day="5">F</button>
+        <button class="day-pill" data-day="6">S</button>
+      </div>
+      <div class="task-add-row">
+        <input type="text" id="setup-task-input" class="task-input" placeholder="Add a task…">
+        <button class="btn-add" id="setup-task-add">+</button>
+      </div>
+      <div class="task-list" id="setup-task-list"></div>
+    </div>
+
+    <div class="setup-section">
+      <div class="setup-label">Theme</div>
+      <div class="theme-grid" id="setup-theme-grid"></div>
+    </div>
+
+    <button class="btn-start" id="btn-start">Start the 75</button>
+  </section>
+
+  <!-- ══ TODAY SCREEN ══ -->
+  <section id="screen-today" class="screen">
+    <div class="today-hero">
+      <div class="today-day" id="today-day-num">Day <span id="today-x">1</span></div>
+      <div class="today-date" id="today-date"></div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="today-progress" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="task-rows" id="today-task-rows"></div>
+  </section>
+
+  <!-- ══ HISTORY SCREEN ══ -->
+  <section id="screen-history" class="screen">
+    <div class="screen-header">
+      <div class="screen-title">History</div>
+    </div>
+    <div class="history-list" id="history-list"></div>
+  </section>
+
+  <!-- ══ SETTINGS SCREEN ══ -->
+  <section id="screen-settings" class="screen">
+    <div class="screen-header">
+      <div class="screen-title">Settings</div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-label">Theme</div>
+      <div class="theme-grid" id="settings-theme-grid"></div>
+    </div>
+
+    <div class="settings-divider"></div>
+
+    <div class="settings-section">
+      <div class="settings-section-label">Tasks</div>
+      <div class="settings-task-list" id="settings-task-list"></div>
+      <div class="freq-toggle" id="settings-freq-toggle">
+        <button class="freq-btn active" data-freq="daily">Daily</button>
+        <button class="freq-btn" data-freq="specific">Specific days</button>
+      </div>
+      <div class="day-picker" id="settings-day-picker" style="display:none">
+        <button class="day-pill" data-day="0">S</button>
+        <button class="day-pill" data-day="1">M</button>
+        <button class="day-pill" data-day="2">T</button>
+        <button class="day-pill" data-day="3">W</button>
+        <button class="day-pill" data-day="4">T</button>
+        <button class="day-pill" data-day="5">F</button>
+        <button class="day-pill" data-day="6">S</button>
+      </div>
+      <div class="task-add-row">
+        <input type="text" id="settings-task-input" class="task-input" placeholder="Add a task…">
+        <button class="btn-add" id="settings-task-add">+</button>
+      </div>
+      <button class="btn-save-tasks" id="btn-save-tasks">Save Tasks</button>
+    </div>
+
+    <div class="settings-divider"></div>
+
+    <div class="settings-section" style="padding-bottom: 32px;">
+      <div class="settings-section-label">Data</div>
+      <button class="btn-settings" id="btn-export">Export Log (JSON)</button>
+      <button class="btn-settings btn-danger" id="btn-reset">Reset Challenge</button>
+      <div class="confirm-row" id="confirm-row">
+        <button class="btn-confirm-no" id="btn-confirm-no">Cancel</button>
+        <button class="btn-confirm-yes" id="btn-confirm-yes">Yes, reset everything</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ TAB BAR ══ -->
+  <nav class="tab-bar" id="tab-bar" style="display:none">
+    <button data-screen="today" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      Today
+    </button>
+    <button data-screen="history">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      History
+    </button>
+    <button data-screen="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      Settings
+    </button>
+  </nav>
+
+  <script>
+    // ── Storage ──
+    const CONFIG_KEY = '75hard_config';
+    const LOG_KEY    = '75hard_log';
+    function loadConfig() { try { return JSON.parse(localStorage.getItem(CONFIG_KEY)); } catch { return null; } }
+    function saveConfig(c) { localStorage.setItem(CONFIG_KEY, JSON.stringify(c)); }
+    function loadLog()    { try { return JSON.parse(localStorage.getItem(LOG_KEY)) || {}; } catch { return {}; } }
+    function saveLog(l)   { localStorage.setItem(LOG_KEY, JSON.stringify(l)); }
+
+    // ── Utilities ──
+    function uid() { return 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
+    function todayKey() { return new Date().toISOString().slice(0, 10); }
+    function dateKey(d) { return d.toISOString().slice(0, 10); }
+
+    function getTasksForDate(tasks, date) {
+      const day = date.getDay();
+      return tasks.filter(t => t.days === 'daily' || (Array.isArray(t.days) && t.days.includes(day)));
+    }
+
+    function getDayNumber(startDate) {
+      const diff = Math.floor((new Date() - new Date(startDate)) / 86400000);
+      return diff + 1;
+    }
+
+    function formatDate(isoStr) {
+      const d = new Date(isoStr + 'T00:00:00');
+      return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+    }
+
+    // ── Theme data ──
+    const THEMES = [
+      { id: 'quest', name: 'The Quest',    bg: '#0E1210', accent: '#4A7358' },
+      { id: 'hero',  name: 'Old World',    bg: '#1C1A14', accent: '#D4B896' },
+      { id: 'anime', name: 'Anime',        bg: '#0D0A1A', accent: '#9B30FF' },
+      { id: 'spark', name: 'The Spark',    bg: '#1A1410', accent: '#9B2335' },
+      { id: 'abyss', name: 'The Abyss',   bg: '#0A0A0C', accent: '#6B7280' },
+    ];
+
+    function applyTheme(id) {
+      document.body.dataset.theme = id;
+    }
+
+    function buildThemeGrid(containerId, currentTheme, onSelect) {
+      const grid = document.getElementById(containerId);
+      grid.innerHTML = '';
+      THEMES.forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'theme-card' + (t.id === currentTheme ? ' active' : '');
+        card.innerHTML = `<div class="theme-swatch" style="background:${t.accent};box-shadow:0 0 0 3px ${t.bg}"></div><div class="theme-card-name">${t.name}</div>`;
+        card.addEventListener('click', () => {
+          grid.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+          applyTheme(t.id);
+          onSelect(t.id);
+        });
+        grid.appendChild(card);
+      });
+    }
+
+    // ── Navigation ──
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + id).classList.add('active');
+      document.querySelectorAll('.tab-bar button').forEach(b => {
+        b.classList.toggle('active', b.dataset.screen === id);
+      });
+      if (id === 'today') renderToday();
+      if (id === 'history') renderHistory();
+      if (id === 'settings') renderSettings();
+    }
+
+    // ── SETUP SCREEN ──
+    let setupTasks = [];
+    let setupFreq  = 'daily';
+    let setupDays  = [];
+    let setupTheme = 'quest';
+
+    function initSetup() {
+      // Default date = today
+      document.getElementById('setup-date').value = todayKey();
+
+      // Default tasks
+      setupTasks = [
+        { id: uid(), label: 'Drink 1 gallon water', days: 'daily' },
+        { id: uid(), label: 'Outdoor workout (45 min)', days: 'daily' },
+        { id: uid(), label: 'Read 10 pages', days: 'daily' },
+        { id: uid(), label: 'Follow a diet', days: 'daily' },
+        { id: uid(), label: 'No alcohol', days: 'daily' },
+      ];
+      renderSetupTasks();
+
+      // Freq toggle
+      document.querySelectorAll('#screen-setup .freq-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          setupFreq = btn.dataset.freq;
+          document.querySelectorAll('#screen-setup .freq-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById('setup-day-picker').style.display = setupFreq === 'specific' ? 'flex' : 'none';
+        });
+      });
+
+      // Day pills
+      document.querySelectorAll('#setup-day-picker .day-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          const d = parseInt(pill.dataset.day);
+          if (setupDays.includes(d)) { setupDays = setupDays.filter(x => x !== d); pill.classList.remove('active'); }
+          else { setupDays.push(d); pill.classList.add('active'); }
+        });
+      });
+
+      // Add task
+      const taskInput = document.getElementById('setup-task-input');
+      document.getElementById('setup-task-add').addEventListener('click', () => addSetupTask(taskInput));
+      taskInput.addEventListener('keydown', e => { if (e.key === 'Enter') addSetupTask(taskInput); });
+
+      // Theme grid
+      buildThemeGrid('setup-theme-grid', setupTheme, id => { setupTheme = id; });
+
+      // Start button
+      document.getElementById('btn-start').addEventListener('click', startChallenge);
+    }
+
+    function addSetupTask(input) {
+      const label = input.value.trim();
+      if (!label) return;
+      const days = setupFreq === 'daily' ? 'daily' : [...setupDays];
+      setupTasks.push({ id: uid(), label, days });
+      input.value = '';
+      renderSetupTasks();
+    }
+
+    function renderSetupTasks() {
+      const list = document.getElementById('setup-task-list');
+      list.innerHTML = '';
+      setupTasks.forEach((t, i) => {
+        const item = document.createElement('div');
+        item.className = 'task-item';
+        const freqLabel = t.days === 'daily' ? 'Daily' : 'Custom days';
+        item.innerHTML = `
+          <span class="task-item-label">${t.label}</span>
+          <span class="task-item-freq">${freqLabel}</span>
+          <div class="task-item-btns">
+            <button onclick="moveSetupTask(${i},-1)">↑</button>
+            <button onclick="moveSetupTask(${i},1)">↓</button>
+            <button class="btn-del" onclick="deleteSetupTask(${i})">✕</button>
+          </div>`;
+        list.appendChild(item);
+      });
+    }
+
+    function moveSetupTask(i, dir) {
+      const j = i + dir;
+      if (j < 0 || j >= setupTasks.length) return;
+      [setupTasks[i], setupTasks[j]] = [setupTasks[j], setupTasks[i]];
+      renderSetupTasks();
+    }
+
+    function deleteSetupTask(i) {
+      setupTasks.splice(i, 1);
+      renderSetupTasks();
+    }
+
+    function startChallenge() {
+      const startDate = document.getElementById('setup-date').value;
+      if (!startDate) return;
+      if (setupTasks.length === 0) return;
+      const config = { startDate, theme: setupTheme, tasks: setupTasks };
+      saveConfig(config);
+      applyTheme(setupTheme);
+      document.getElementById('tab-bar').style.display = 'flex';
+      showScreen('today');
+    }
+
+    // ── TODAY SCREEN ──
+    function renderToday() {
+      const config = loadConfig();
+      if (!config) return;
+
+      const dayNum = getDayNumber(config.startDate);
+      const isComplete = dayNum > 75;
+
+      const dayEl = document.getElementById('today-x');
+      dayEl.textContent = isComplete ? '75' : dayNum;
+      document.getElementById('today-date').textContent = formatDate(todayKey());
+
+      if (isComplete) {
+        document.getElementById('today-day-num').innerHTML = '<span style="font-size:28px">Challenge Complete 🏆</span>';
+      }
+
+      const today = new Date();
+      const tasks = getTasksForDate(config.tasks, today);
+      const log = loadLog();
+      const entry = log[todayKey()] || { completed: [], photoTaken: false };
+
+      const rows = document.getElementById('today-task-rows');
+      rows.innerHTML = '';
+
+      const total = tasks.length + 1; // +1 for photo
+
+      tasks.forEach(task => {
+        const checked = entry.completed.includes(task.id);
+        const row = document.createElement('div');
+        row.className = 'task-row' + (checked ? ' checked' : '');
+        row.innerHTML = `
+          <div class="task-checkbox">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="2 6.5 5.5 10 11 3"/>
+            </svg>
+          </div>
+          <div class="task-row-label">${task.label}</div>`;
+        if (!isComplete) {
+          row.addEventListener('click', () => toggleTask(task.id, row, total, tasks.length));
+        }
+        rows.appendChild(row);
+      });
+
+      // Photo row
+      const photoRow = document.createElement('div');
+      photoRow.className = 'task-row' + (entry.photoTaken ? ' checked' : '');
+      photoRow.innerHTML = `
+        <div class="task-checkbox">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="2 6.5 5.5 10 11 3"/>
+          </svg>
+        </div>
+        <div class="task-row-label">Progress photo taken</div>`;
+      if (!isComplete) {
+        photoRow.addEventListener('click', () => togglePhoto(photoRow, total, tasks.length));
+      }
+      rows.appendChild(photoRow);
+
+      updateProgress(entry, total);
+    }
+
+    function toggleTask(taskId, row, total, taskCount) {
+      const log = loadLog();
+      const key = todayKey();
+      if (!log[key]) log[key] = { completed: [], photoTaken: false };
+      const idx = log[key].completed.indexOf(taskId);
+      if (idx === -1) log[key].completed.push(taskId);
+      else log[key].completed.splice(idx, 1);
+      saveLog(log);
+      row.classList.toggle('checked');
+      updateProgress(log[key], total);
+    }
+
+    function togglePhoto(row, total) {
+      const log = loadLog();
+      const key = todayKey();
+      if (!log[key]) log[key] = { completed: [], photoTaken: false };
+      log[key].photoTaken = !log[key].photoTaken;
+      saveLog(log);
+      row.classList.toggle('checked');
+      updateProgress(log[key], total);
+    }
+
+    function updateProgress(entry, total) {
+      const done = (entry.completed || []).length + (entry.photoTaken ? 1 : 0);
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      document.getElementById('today-progress').style.width = pct + '%';
+    }
+
+    // ── HISTORY SCREEN ──
+    function renderHistory() {
+      const config = loadConfig();
+      if (!config) return;
+      const log = loadLog();
+      const list = document.getElementById('history-list');
+      list.innerHTML = '';
+
+      const start = new Date(config.startDate + 'T00:00:00');
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const dates = [];
+      for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
+        dates.push(new Date(d));
+      }
+      dates.reverse();
+
+      const taskMap = {};
+      config.tasks.forEach(t => { taskMap[t.id] = t.label; });
+
+      dates.forEach((d, idx) => {
+        const key = dateKey(d);
+        const dayNum = Math.floor((d - start) / 86400000) + 1;
+        const entry = log[key] || { completed: [], photoTaken: false };
+        const applicableTasks = getTasksForDate(config.tasks, d);
+        const total = applicableTasks.length + 1;
+        const done = (entry.completed || []).length + (entry.photoTaken ? 1 : 0);
+        const isPast = d < today;
+
+        let statusIcon, statusColor;
+        if (done === total && total > 1) {
+          statusIcon = '✓'; statusColor = 'var(--success-text)';
+        } else if (done > 0) {
+          statusIcon = '◑'; statusColor = 'var(--warning-text)';
+        } else if (isPast) {
+          statusIcon = '✗'; statusColor = 'var(--danger-text)';
+        } else {
+          statusIcon = '—'; statusColor = 'var(--text-secondary)';
+        }
+
+        const row = document.createElement('div');
+        row.className = 'hist-row';
+
+        const detail = document.createElement('div');
+        detail.className = 'hist-detail';
+
+        applicableTasks.forEach(t => {
+          const checked = (entry.completed || []).includes(t.id);
+          const item = document.createElement('div');
+          item.className = 'hist-detail-item';
+          item.style.color = checked ? 'var(--text-primary)' : 'var(--text-secondary)';
+          item.innerHTML = `<span>${taskMap[t.id] || t.id}</span>`;
+          detail.appendChild(item);
+        });
+
+        const photoItem = document.createElement('div');
+        photoItem.className = 'hist-detail-item';
+        photoItem.style.color = entry.photoTaken ? 'var(--text-primary)' : 'var(--text-secondary)';
+        photoItem.innerHTML = `<span>Progress photo</span>`;
+        detail.appendChild(photoItem);
+
+        row.innerHTML = `
+          <div class="hist-row-main">
+            <div class="hist-day-num">Day ${Math.min(dayNum, 75)}</div>
+            <div class="hist-date">${formatDate(key)}</div>
+            <div class="hist-status" style="color:${statusColor}">${statusIcon}</div>
+          </div>`;
+        row.appendChild(detail);
+
+        row.querySelector('.hist-row-main').addEventListener('click', () => {
+          detail.classList.toggle('open');
+        });
+
+        list.appendChild(row);
+      });
+    }
+
+    // ── SETTINGS SCREEN ──
+    let settingsTasks = [];
+    let settingsFreq  = 'daily';
+    let settingsDays  = [];
+
+    function renderSettings() {
+      const config = loadConfig();
+      if (!config) return;
+
+      settingsTasks = config.tasks.map(t => ({ ...t }));
+      settingsFreq  = 'daily';
+      settingsDays  = [];
+
+      buildThemeGrid('settings-theme-grid', config.theme, id => {
+        const c = loadConfig();
+        c.theme = id;
+        saveConfig(c);
+      });
+
+      // Reset day pills
+      document.querySelectorAll('#settings-day-picker .day-pill').forEach(p => p.classList.remove('active'));
+      document.getElementById('settings-day-picker').style.display = 'none';
+      document.querySelectorAll('#settings-freq-toggle .freq-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.freq === 'daily');
+      });
+
+      renderSettingsTasks();
+    }
+
+    function renderSettingsTasks() {
+      const list = document.getElementById('settings-task-list');
+      list.innerHTML = '';
+      settingsTasks.forEach((t, i) => {
+        const item = document.createElement('div');
+        item.className = 'task-item';
+        const freqLabel = t.days === 'daily' ? 'Daily' : 'Custom';
+        item.innerHTML = `
+          <span class="task-item-label">${t.label}</span>
+          <span class="task-item-freq">${freqLabel}</span>
+          <div class="task-item-btns">
+            <button onclick="moveSettingsTask(${i},-1)">↑</button>
+            <button onclick="moveSettingsTask(${i},1)">↓</button>
+            <button class="btn-del" onclick="deleteSettingsTask(${i})">✕</button>
+          </div>`;
+        list.appendChild(item);
+      });
+    }
+
+    function moveSettingsTask(i, dir) {
+      const j = i + dir;
+      if (j < 0 || j >= settingsTasks.length) return;
+      [settingsTasks[i], settingsTasks[j]] = [settingsTasks[j], settingsTasks[i]];
+      renderSettingsTasks();
+    }
+
+    function deleteSettingsTask(i) {
+      settingsTasks.splice(i, 1);
+      renderSettingsTasks();
+    }
+
+    // ── Wire up Settings events (once) ──
+    document.querySelectorAll('#settings-freq-toggle .freq-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        settingsFreq = btn.dataset.freq;
+        document.querySelectorAll('#settings-freq-toggle .freq-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('settings-day-picker').style.display = settingsFreq === 'specific' ? 'flex' : 'none';
+      });
+    });
+
+    document.querySelectorAll('#settings-day-picker .day-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const d = parseInt(pill.dataset.day);
+        if (settingsDays.includes(d)) { settingsDays = settingsDays.filter(x => x !== d); pill.classList.remove('active'); }
+        else { settingsDays.push(d); pill.classList.add('active'); }
+      });
+    });
+
+    const settingsTaskInput = document.getElementById('settings-task-input');
+    document.getElementById('settings-task-add').addEventListener('click', () => addSettingsTask(settingsTaskInput));
+    settingsTaskInput.addEventListener('keydown', e => { if (e.key === 'Enter') addSettingsTask(settingsTaskInput); });
+
+    function addSettingsTask(input) {
+      const label = input.value.trim();
+      if (!label) return;
+      const days = settingsFreq === 'daily' ? 'daily' : [...settingsDays];
+      settingsTasks.push({ id: uid(), label, days });
+      input.value = '';
+      renderSettingsTasks();
+    }
+
+    document.getElementById('btn-save-tasks').addEventListener('click', () => {
+      const config = loadConfig();
+      config.tasks = settingsTasks;
+      saveConfig(config);
+      const btn = document.getElementById('btn-save-tasks');
+      btn.textContent = 'Saved ✓';
+      setTimeout(() => { btn.textContent = 'Save Tasks'; }, 1500);
+    });
+
+    document.getElementById('btn-export').addEventListener('click', () => {
+      const data = JSON.stringify(loadLog(), null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = '75hard-log.json';
+      a.click();
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      document.getElementById('confirm-row').classList.add('open');
+    });
+    document.getElementById('btn-confirm-no').addEventListener('click', () => {
+      document.getElementById('confirm-row').classList.remove('open');
+    });
+    document.getElementById('btn-confirm-yes').addEventListener('click', () => {
+      const config = loadConfig();
+      config.startDate = todayKey();
+      saveConfig(config);
+      saveLog({});
+      document.getElementById('confirm-row').classList.remove('open');
+      showScreen('today');
+    });
+
+    // ── Tab bar ──
+    document.querySelectorAll('.tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => showScreen(btn.dataset.screen));
+    });
+
+    // ── Init ──
+    (function init() {
+      const config = loadConfig();
+      if (!config) {
+        initSetup();
+        document.getElementById('tab-bar').style.display = 'none';
+      } else {
+        applyTheme(config.theme);
+        document.getElementById('tab-bar').style.display = 'flex';
+        showScreen('today');
+      }
+    })();
+  </script>
+</body>
+</html>
