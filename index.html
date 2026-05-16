@@ -646,6 +646,7 @@
     ];
 
     function showSplash() {
+      document.body.style.background = '#000';
       const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
       const el = document.getElementById('splash-quote');
       el.textContent = q.text;
@@ -655,7 +656,7 @@
       const splash = document.getElementById('screen-splash');
       setTimeout(() => {
         splash.classList.add('fade-out');
-        setTimeout(() => splash.remove(), 700);
+        setTimeout(() => { splash.remove(); document.body.style.background = ''; }, 700);
       }, 2300);
     }
 
